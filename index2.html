@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Recognition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        video {
+            max-width: 100%;
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+
+        #output {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        #sequence {
+            margin-top: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign Language Recognition</h1>
+    
+    <video id="video" playsinline autoplay muted></video>
+
+    <div id="output">Prediction: <span id="prediction">-</span></div>
+    <div id="sequence">Sequence: <span id="sequenceText">-</span></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const predictionElement = document.getElementById('prediction');
+        const sequenceElement = document.getElementById('sequenceText');
+
+        // Start webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => console.error('Error accessing webcam:', err));
+
+        // Function to send image data to the server and update UI
+        function processImage(imageData) {
+            fetch('/recognize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: imageData }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                predictionElement.textContent = data.prediction;
+                sequenceElement.textContent = data.sequence;
+            })
+            .catch(error => console.error('Error processing image:', error));
+        }
+
+        // Function to capture and send image data every second
+        setInterval(() => {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
+            processImage(imageData);
+        }, 1000);
+    </script>
+</body>
+</html>

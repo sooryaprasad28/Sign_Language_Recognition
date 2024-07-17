@@ -1,0 +1,27 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+#video {
+    width: 640px;
+    height: 480px;
+    border: 1px solid #ddd;
+}
+
+#text-display {
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+#clear-button {
+    padding: 10px 20px;
+    background-color: #ccc;
+    border: none;
+    cursor: pointer;
+}
+s
